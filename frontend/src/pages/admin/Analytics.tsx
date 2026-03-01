@@ -22,50 +22,60 @@ const COLORS = ['hsl(217, 91%, 53%)', 'hsl(142, 71%, 45%)', 'hsl(45, 93%, 47%)',
 const Analytics = () => (
   <div className="min-h-screen bg-secondary/30">
     <Navbar />
-    <div className="page-container py-8">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
-        <p className="text-muted-foreground mt-1">Detailed statistics and insights</p>
+    <div className="page-container py-24">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
+        <span className="inline-block px-4 py-2 rounded-full text-xs font-bold bg-success/10 text-success mb-4 tracking-wide border border-success/20">DATA INTELLIGENCE</span>
+        <h1 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight">System <span className="text-transparent bg-clip-text bg-gradient-to-r from-success to-success/50 text-glow">Analytics</span></h1>
+        <p className="text-lg text-muted-foreground mt-2">Deep dive into campus recovery statistics and spatial distribution.</p>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-card rounded-xl border border-border p-6">
-          <h3 className="font-semibold text-foreground mb-4">Monthly Found vs Returned</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 32%, 91%)" />
-              <XAxis dataKey="month" fontSize={12} />
-              <YAxis fontSize={12} />
-              <Tooltip />
-              <Bar dataKey="found" fill="hsl(217, 91%, 53%)" radius={[4, 4, 0, 0]} name="Found" />
-              <Bar dataKey="returned" fill="hsl(142, 71%, 45%)" radius={[4, 4, 0, 0]} name="Returned" />
-            </BarChart>
-          </ResponsiveContainer>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bento-box p-6 md:p-8 bg-card/40 backdrop-blur-xl group relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          <h3 className="text-xl font-extrabold text-foreground mb-6 uppercase tracking-wider flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_theme(colors.primary.DEFAULT)]" /> Recovery Operations</h3>
+          <div className="h-80 select-none relative z-10 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={monthlyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-10" vertical={false} />
+                <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted-foreground)' }} dy={10} />
+                <YAxis fontSize={12} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted-foreground)' }} />
+                <Tooltip cursor={{ fill: 'var(--foreground)', opacity: 0.05 }} contentStyle={{ borderRadius: '16px', border: '1px solid var(--border)', backgroundColor: 'var(--card)', padding: '12px 16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }} itemStyle={{ fontWeight: 'bold' }} />
+                <Bar dataKey="found" fill="hsl(var(--primary))" radius={[4, 4, 4, 4]} name="Found" barSize={20} />
+                <Bar dataKey="returned" fill="hsl(var(--success))" radius={[4, 4, 4, 4]} name="Returned" barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-card rounded-xl border border-border p-6">
-          <h3 className="font-semibold text-foreground mb-4">Items by Location</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie data={locationData} cx="50%" cy="50%" outerRadius={100} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} fontSize={11}>
-                {locationData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bento-box p-6 md:p-8 bg-card/40 backdrop-blur-xl group relative overflow-hidden flex flex-col justify-center">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-info/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          <h3 className="text-xl font-extrabold text-foreground mb-6 self-start uppercase tracking-wider flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-info shadow-[0_0_10px_theme(colors.info.DEFAULT)]" /> Spatial Distribution</h3>
+          <div className="h-80 select-none relative z-10 w-full ml-[-20px] sm:ml-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={locationData} cx="50%" cy="50%" innerRadius={70} outerRadius={110} paddingAngle={5} dataKey="value" stroke="none" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                  {locationData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} className="hover:opacity-80 transition-opacity outline-none" style={{ filter: `drop-shadow(0px 0px 8px ${COLORS[i % COLORS.length]}40)` }} />)}
+                </Pie>
+                <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid var(--border)', backgroundColor: 'var(--card)', padding: '12px 16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }} itemStyle={{ fontWeight: 'bold' }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-card rounded-xl border border-border p-6 lg:col-span-2">
-          <h3 className="font-semibold text-foreground mb-4">Success Rate Trend</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={monthlyData.map(m => ({ ...m, rate: Math.round((m.returned / m.found) * 100) }))}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(214, 32%, 91%)" />
-              <XAxis dataKey="month" fontSize={12} />
-              <YAxis fontSize={12} domain={[0, 100]} />
-              <Tooltip formatter={(v: number) => `${v}%`} />
-              <Line type="monotone" dataKey="rate" stroke="hsl(217, 91%, 53%)" strokeWidth={2} dot={{ fill: 'hsl(217, 91%, 53%)' }} name="Success Rate" />
-            </LineChart>
-          </ResponsiveContainer>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bento-box p-6 md:p-8 bg-card/40 backdrop-blur-xl lg:col-span-2 group relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-success/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+          <h3 className="text-xl font-extrabold text-foreground mb-6 uppercase tracking-wider flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-success shadow-[0_0_10px_theme(colors.success.DEFAULT)]" /> Resolution Trajectory</h3>
+          <div className="h-64 select-none relative z-10 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={monthlyData.map(m => ({ ...m, rate: Math.round((m.returned / m.found) * 100) }))} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="opacity-10" vertical={false} />
+                <XAxis dataKey="month" fontSize={12} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted-foreground)' }} dy={10} />
+                <YAxis fontSize={12} domain={[0, 100]} tickLine={false} axisLine={false} tick={{ fill: 'var(--muted-foreground)' }} />
+                <Tooltip cursor={{ stroke: 'var(--foreground)', strokeWidth: 1, opacity: 0.1, strokeDasharray: '5 5' }} contentStyle={{ borderRadius: '16px', border: '1px solid var(--border)', backgroundColor: 'var(--card)', padding: '12px 16px', boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }} itemStyle={{ color: 'var(--success)', fontWeight: 'bold' }} formatter={(v: number) => `${v}%`} />
+                <Line type="monotone" dataKey="rate" stroke="hsl(var(--success))" strokeWidth={4} dot={{ fill: 'hsl(var(--success))', strokeWidth: 2, r: 4, stroke: 'var(--card)' }} activeDot={{ r: 8, strokeWidth: 0, fill: 'hsl(var(--success))', className: 'drop-shadow-[0_0_8px_rgba(var(--success),0.8)]' }} name="Resolution Rate" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </motion.div>
       </div>
     </div>

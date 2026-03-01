@@ -5,7 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import ProtectedRoute from "@/components/shared/ProtectedRoute";
+import { GlobalSplashScreen } from "@/components/shared/GlobalSplashScreen";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -32,48 +34,51 @@ import AdminSettings from "./pages/admin/AdminSettings";
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <NotificationProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/lost-items" element={<LostItems />} />
-              <Route path="/item/:id" element={<ItemDetails />} />
-              <Route path="/about" element={<AboutUs />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/student-login" element={<StudentLogin />} />
-              <Route path="/guard-login" element={<GuardLogin />} />
-              <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/guard-register" element={<GuardRegister />} />
+  <ThemeProvider defaultTheme="light" storageKey="sggs-theme">
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <GlobalSplashScreen />
+            <Toaster />
+            <Sonner />
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/lost-items" element={<LostItems />} />
+                <Route path="/item/:id" element={<ItemDetails />} />
+                <Route path="/about" element={<AboutUs />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/student-login" element={<StudentLogin />} />
+                <Route path="/guard-login" element={<GuardLogin />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/guard-register" element={<GuardRegister />} />
 
-              {/* Student Routes */}
-              <Route path="/student/dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
-              <Route path="/student/claims" element={<ProtectedRoute allowedRoles={['student']}><MyClaims /></ProtectedRoute>} />
-              <Route path="/student/report" element={<ProtectedRoute allowedRoles={['student']}><ReportFound /></ProtectedRoute>} />
+                {/* Student Routes */}
+                <Route path="/student/dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />
+                <Route path="/student/claims" element={<ProtectedRoute allowedRoles={['student']}><MyClaims /></ProtectedRoute>} />
+                <Route path="/student/report" element={<ProtectedRoute allowedRoles={['student']}><ReportFound /></ProtectedRoute>} />
 
-              {/* Guard Routes */}
-              <Route path="/guard/dashboard" element={<ProtectedRoute allowedRoles={['guard']}><GuardDashboard /></ProtectedRoute>} />
-              <Route path="/guard/items" element={<ProtectedRoute allowedRoles={['guard']}><ManageItems /></ProtectedRoute>} />
-              <Route path="/guard/claims" element={<ProtectedRoute allowedRoles={['guard']}><VerifyClaims /></ProtectedRoute>} />
+                {/* Guard Routes */}
+                <Route path="/guard/dashboard" element={<ProtectedRoute allowedRoles={['guard']}><GuardDashboard /></ProtectedRoute>} />
+                <Route path="/guard/items" element={<ProtectedRoute allowedRoles={['guard']}><ManageItems /></ProtectedRoute>} />
+                <Route path="/guard/claims" element={<ProtectedRoute allowedRoles={['guard']}><VerifyClaims /></ProtectedRoute>} />
 
-              {/* Admin Routes */}
-              <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
-              <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={['admin']}><Analytics /></ProtectedRoute>} />
-              <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><AdminSettings /></ProtectedRoute>} />
+                {/* Admin Routes */}
+                <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['admin']}><UserManagement /></ProtectedRoute>} />
+                <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={['admin']}><Analytics /></ProtectedRoute>} />
+                <Route path="/admin/settings" element={<ProtectedRoute allowedRoles={['admin']}><AdminSettings /></ProtectedRoute>} />
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </NotificationProvider>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </NotificationProvider>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ThemeProvider>
 );
 
 export default App;

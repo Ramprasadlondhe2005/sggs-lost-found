@@ -94,13 +94,13 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   }
 }
 
 @layer utilities {
   .glass-card {
-    @apply bg-card/80 backdrop-blur-sm border border-border/50 shadow-sm;
+    @apply bg-card/60 backdrop-blur-2xl border border-border/50 shadow-xl transition-all duration-300 hover:shadow-2xl hover:bg-card/80;
   }
 
   .section-padding {
@@ -109,5 +109,18 @@
 
   .page-container {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Ultra-Premium Utilities */
+  .text-glow {
+    text-shadow: 0 0 20px rgba(var(--primary), 0.5);
+  }
+
+  .glow-border {
+    box-shadow: 0 0 0 1px rgba(var(--primary), 0.2), 0 0 20px 0 rgba(var(--primary), 0.1);
+  }
+
+  .bento-box {
+    @apply bg-card/60 backdrop-blur-2xl border border-border/50 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300;
   }
 }

@@ -81,51 +81,58 @@ const ReportFound = () => {
   return (
     <div className="min-h-screen bg-secondary/30">
       <Navbar />
-      <div className="page-container py-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-2xl font-bold text-foreground">Report Found Item</h1>
-          <p className="text-muted-foreground mt-1">Found something? Help us return it to the owner.</p>
+      <div className="page-container py-24">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center max-w-2xl mx-auto mb-12">
+          <span className="inline-block px-4 py-2 rounded-full text-xs font-bold bg-primary/10 text-primary mb-4 tracking-wide border border-primary/20">CONTRIBUTE</span>
+          <h1 className="text-4xl md:text-5xl font-extrabold text-foreground tracking-tight mb-4">
+            Report <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/50 text-glow">Found Item</span>
+          </h1>
+          <p className="text-lg text-muted-foreground mt-2">Help the community by securely logging found belongings.</p>
         </motion.div>
 
-        <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} onSubmit={handleSubmit} className="mt-6 max-w-xl bg-card rounded-xl border border-border p-6 space-y-4">
-          <div>
-            <label className="text-sm font-medium text-foreground">Item Name</label>
-            <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+        <motion.form initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} onSubmit={handleSubmit} className="mx-auto max-w-2xl bento-box p-8 sm:p-12 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="md:col-span-2">
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 block">Item Name</label>
+              <input required value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full rounded-xl border border-input bg-background/50 backdrop-blur-sm px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-background outline-none transition-all shadow-sm" placeholder="e.g. Black Leather Wallet" />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 block">Category</label>
+              <select required value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full rounded-xl border border-input bg-background/50 backdrop-blur-sm px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-background outline-none transition-all shadow-sm">
+                <option value="">Select Category</option>
+                {categories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 block">Location Found</label>
+              <select required value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} className="w-full rounded-xl border border-input bg-background/50 backdrop-blur-sm px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-background outline-none transition-all shadow-sm">
+                <option value="">Select Location</option>
+                {locations.map(l => <option key={l} value={l}>{l}</option>)}
+              </select>
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 block">Description</label>
+              <textarea required value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} rows={4} className="w-full rounded-xl border border-input bg-background/50 backdrop-blur-sm px-4 py-3 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-background outline-none transition-all shadow-sm resize-none" placeholder="Add specific details like unique markings..." />
+            </div>
+            <div className="md:col-span-2">
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wider mb-2 block">Upload Image</label>
+              <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-input rounded-2xl p-10 cursor-pointer bg-background/20 hover:bg-background/50 hover:border-primary/50 transition-all group">
+                <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Upload className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+                <span className="text-sm text-muted-foreground">{fileName || 'Click to upload image'}</span>
+                <input type="file" accept="image/*" className="hidden" onChange={e => {
+                  if (e.target.files && e.target.files[0]) {
+                    setFileName(e.target.files[0].name);
+                    setImageFile(e.target.files[0]);
+                  }
+                }} />
+              </label>
+            </div>
+            <button type="submit" disabled={reportMutation.isPending} className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-50">
+              {reportMutation.isPending ? 'Submitting...' : 'Submit Report'}
+            </button>
           </div>
-          <div>
-            <label className="text-sm font-medium text-foreground">Category</label>
-            <select required value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-              <option value="">Select Category</option>
-              {categories.map(c => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-foreground">Location Found</label>
-            <select required value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none">
-              <option value="">Select Location</option>
-              {locations.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-foreground">Description</label>
-            <textarea required value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} rows={3} className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
-          </div>
-          <div>
-            <label className="text-sm font-medium text-foreground">Upload Image</label>
-            <label className="mt-1 flex items-center justify-center gap-2 border-2 border-dashed border-input rounded-lg p-6 cursor-pointer hover:border-primary/50 transition-colors">
-              <Upload className="w-5 h-5 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">{fileName || 'Click to upload image'}</span>
-              <input type="file" accept="image/*" className="hidden" onChange={e => {
-                if (e.target.files && e.target.files[0]) {
-                  setFileName(e.target.files[0].name);
-                  setImageFile(e.target.files[0]);
-                }
-              }} />
-            </label>
-          </div>
-          <button type="submit" disabled={reportMutation.isPending} className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors disabled:opacity-50">
-            {reportMutation.isPending ? 'Submitting...' : 'Submit Report'}
-          </button>
         </motion.form>
       </div>
       <Footer />

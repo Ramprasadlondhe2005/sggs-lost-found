@@ -41,24 +41,30 @@ const GuardDashboard = () => {
   return (
     <div className="min-h-screen bg-secondary/30">
       <Navbar />
-      <div className="page-container py-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-2xl font-bold text-foreground">Guard Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Welcome, {user?.name || 'Guard'}</p>
+      <div className="page-container py-24">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-warning/10 border border-warning/20 text-warning text-xs font-bold tracking-widest uppercase mb-6 shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+            <span className="w-2 h-2 rounded-full bg-warning animate-pulse" /> Security Clearance Active
+          </div>
+          <h1 className="text-4xl font-extrabold text-foreground tracking-tight">Guard <span className="text-transparent bg-clip-text bg-gradient-to-r from-warning to-warning/50 text-glow">Dashboard</span></h1>
+          <p className="text-lg text-muted-foreground mt-2">Welcome back, {user?.name || 'Officer'}. Monitor and secure campus property.</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-6">
           {[
-            { label: 'Total Items', value: data.itemsCount, icon: Package, color: 'text-primary', link: '/guard/items' },
-            { label: 'Pending Claims', value: pendingClaims.length, icon: AlertCircle, color: 'text-warning', link: '/guard/claims' },
-            { label: 'Verified', value: verifiedClaims.length, icon: ClipboardCheck, color: 'text-success', link: '/guard/claims' },
-            { label: 'Add Item', value: '+', icon: PlusCircle, color: 'text-info', link: '/guard/items' },
+            { label: 'Total Vault Items', value: data.itemsCount, icon: Package, color: 'text-primary' },
+            { label: 'Action Required', value: pendingClaims.length, icon: AlertCircle, color: 'text-warning' },
+            { label: 'Securely Verified', value: verifiedClaims.length, icon: ClipboardCheck, color: 'text-success' },
+            { label: 'Log New Item', value: '+', icon: PlusCircle, color: 'text-info' },
           ].map((card, i) => (
-            <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <Link to={card.link} className="block bg-card rounded-xl border border-border p-5 hover:shadow-md hover:-translate-y-0.5 transition-all">
-                <card.icon className={`w-8 h-8 ${card.color} mb-3`} />
-                <p className="text-2xl font-bold text-foreground">{card.value}</p>
-                <p className="text-sm text-muted-foreground">{card.label}</p>
+            <motion.div key={card.label} initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.1, type: "spring", stiffness: 100 }}>
+              <Link to="/guard/items" className="bento-box p-6 flex flex-col items-start group relative overflow-hidden block border-l-4" style={{ borderLeftColor: `hsl(var(--${card.color.replace('text-', '')}))` }}>
+                <div className={`absolute inset-0 bg-gradient-to-br from-${card.color.replace('text-', '')}/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className={`w-12 h-12 rounded-xl bg-${card.color.replace('text-', '')}/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <card.icon className={`w-6 h-6 ${card.color} drop-shadow-md`} />
+                </div>
+                <p className="text-4xl font-extrabold text-foreground tracking-tight">{card.value}</p>
+                <p className="text-sm font-bold text-muted-foreground mt-1 uppercase tracking-wider">{card.label}</p>
               </Link>
             </motion.div>
           ))}
