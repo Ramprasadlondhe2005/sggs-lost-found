@@ -11,10 +11,17 @@ const GuardLogin = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(username + '@sggs.ac.in', password, 'guard');
-    navigate('/guard/dashboard');
+    setError('');
+    try {
+      await login(username + '@sggs.ac.in', password, 'guard');
+      navigate('/guard/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Invalid credentials');
+    }
   };
 
   return (
@@ -29,6 +36,7 @@ const GuardLogin = () => {
         <div className="bg-card rounded-2xl border border-border p-8 shadow-sm">
           <h2 className="text-xl font-bold text-foreground">Guard Login</h2>
           <p className="text-sm text-muted-foreground mt-1">Access the security management panel</p>
+          {error && <p className="mt-4 text-sm text-destructive bg-destructive/10 p-3 rounded-lg">{error}</p>}
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
               <label className="text-sm font-medium text-foreground">Username</label>
@@ -43,7 +51,9 @@ const GuardLogin = () => {
             </div>
             <button type="submit" className="w-full bg-primary text-primary-foreground py-2.5 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors">Sign In</button>
           </form>
-          <p className="text-sm text-muted-foreground text-center mt-6">
+          <p className="text-sm text-muted-foreground justify-center flex gap-4 mt-6">
+            <span>Don't have an account? <Link to="/guard-register" className="text-primary hover:text-primary-hover font-medium">Sign Up</Link></span>
+            <span className="text-border">|</span>
             <Link to="/student-login" className="text-primary hover:text-primary-hover font-medium">Student Login</Link>
           </p>
         </div>

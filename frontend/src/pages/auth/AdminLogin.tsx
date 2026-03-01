@@ -12,10 +12,17 @@ const AdminLogin = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [error, setError] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email, password, 'admin');
-    navigate('/admin/dashboard');
+    setError('');
+    try {
+      await login(email, password, 'admin');
+      navigate('/admin/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Invalid credentials');
+    }
   };
 
   return (
@@ -33,6 +40,7 @@ const AdminLogin = () => {
             <h2 className="text-xl font-bold text-foreground">Admin Login</h2>
           </div>
           <p className="text-sm text-muted-foreground mt-1">Restricted access — administrators only</p>
+          {error && <p className="mt-4 text-sm text-destructive bg-destructive/10 p-3 rounded-lg">{error}</p>}
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <div>
               <label className="text-sm font-medium text-foreground">Email</label>

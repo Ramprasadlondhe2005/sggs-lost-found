@@ -25,10 +25,9 @@ router.get('/:id', param('id').isMongoId(), getItemById);
 // Protected routes (require authentication)
 router.use(protect);
 
-// Guard/Admin routes
+// Authenticated users can create items
 router.post(
     '/',
-    isGuard,
     uploadSingle,
     handleUploadError,
     createItem

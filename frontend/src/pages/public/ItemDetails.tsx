@@ -1,11 +1,26 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { mockItems } from '@/data/mockData';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { MapPin, Calendar, Tag, ArrowLeft } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState } from 'react';
+
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { api } from '@/lib/axios';
+
+const fetchItemDetails = async (id: string) => {
+  const { data } = await api.get(`/items/${id}`);
+  if (data.success && data.item) {
+    return {
+      ...data.item,
+      id: data.item._id,
+      name: data.item.title,
+      date: new Date(data.item.foundDate || data.item.createdAt).toLocaleDateString(),
+    };
+  }
+  throw new Error('Item not found');
+};
 
 const statusStyles: Record<string, string> = {
   available: 'bg-success/10 text-success',
@@ -17,12 +32,48 @@ const ItemDetails = () => {
   const { id } = useParams();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const item = mockItems.find(i => i.id === id);
+
+  const { data: item, isLoading, isError } = useQuery({
+    queryKey: ['item', id],
+    queryFn: () => fetchItemDetails(id as string),
+    enabled: !!id,
+  });
+
   const [showClaimForm, setShowClaimForm] = useState(false);
   const [reason, setReason] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  if (!item) return (
+  const claimMutation = useMutation({
+    mutationFn: async (payload: { itemId: string, reason: string }) => {
+      const { data } = await api.post('/claims', payload);
+      return data;
+    },
+    onSuccess: () => {
+      setSubmitted(true);
+      setShowClaimForm(false);
+    },
+    onError: (err: any) => {
+      alert(err.response?.data?.message || 'Failed to submit claim');
+    }
+  });
+
+  const submitClaim = (e: React.FormEvent) => {
+    e.preventDefault();
+    claimMutation.mutate({ itemId: id as string, reason });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="page-container py-16 text-center">
+          <p className="text-muted-foreground">Loading item details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !item) return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="page-container py-16 text-center">
@@ -35,12 +86,6 @@ const ItemDetails = () => {
   const handleClaim = () => {
     if (!isAuthenticated) { navigate('/student-login'); return; }
     setShowClaimForm(true);
-  };
-
-  const submitClaim = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setShowClaimForm(false);
   };
 
   return (

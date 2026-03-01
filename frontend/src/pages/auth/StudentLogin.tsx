@@ -12,13 +12,14 @@ const StudentLogin = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (login(email, password, 'student')) {
+    try {
+      await login(email, password, 'student');
       navigate('/student/dashboard');
-    } else {
-      setError('Invalid credentials');
+    } catch (err: any) {
+      setError(err.message || 'Invalid credentials');
     }
   };
 

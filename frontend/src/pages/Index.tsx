@@ -4,7 +4,22 @@ import { Search, Shield, Clock, Mail, CheckCircle, Users, TrendingUp, ArrowRight
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ItemCard from '@/components/shared/ItemCard';
-import { mockItems } from '@/data/mockData';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/axios';
+import { LostItem } from '@/types';
+
+const fetchRecentItems = async (): Promise<LostItem[]> => {
+  const { data } = await api.get('/items/recent?limit=4');
+  if (data.success && data.items) {
+    return data.items.map((item: any) => ({
+      ...item,
+      id: item._id,
+      name: item.title,
+      date: new Date(item.foundDate || item.createdAt).toLocaleDateString(),
+    }));
+  }
+  return [];
+};
 
 const stats = [
   { label: 'Items Found', value: '500+', icon: Search },
@@ -20,6 +35,11 @@ const trustItems = [
 ];
 
 const Index = () => {
+  const { data: recentItems = [], isLoading } = useQuery({
+    queryKey: ['recentItems'],
+    queryFn: fetchRecentItems,
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -87,9 +107,15 @@ const Index = () => {
             </Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {mockItems.slice(0, 4).map((item, i) => (
-              <ItemCard key={item.id} item={item} index={i} />
-            ))}
+            {isLoading ? (
+              <p className="text-muted-foreground col-span-full">Loading recent items...</p>
+            ) : recentItems.length > 0 ? (
+              recentItems.map((item, i) => (
+                <ItemCard key={item.id} item={item} index={i} />
+              ))
+            ) : (
+              <p className="text-muted-foreground col-span-full">No recent items found.</p>
+            )}
           </div>
         </div>
       </section>

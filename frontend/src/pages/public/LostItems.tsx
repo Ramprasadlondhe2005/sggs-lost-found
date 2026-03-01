@@ -3,15 +3,37 @@ import { Search } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import ItemCard from '@/components/shared/ItemCard';
-import { mockItems, categories } from '@/data/mockData';
+const categories = ['Electronics', 'Documents', 'Accessories', 'Books', 'Clothing', 'Keys', 'Other'];
 import { motion } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/axios';
+import { LostItem } from '@/types';
+
+const fetchItems = async (): Promise<LostItem[]> => {
+  const { data } = await api.get('/items');
+  if (data.success && data.items) {
+    return data.items.map((item: any) => ({
+      ...item,
+      id: item._id,
+      name: item.title,
+      date: new Date(item.foundDate || item.createdAt).toLocaleDateString(),
+    }));
+  }
+  return [];
+};
 
 const LostItems = () => {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
 
-  const filtered = mockItems.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) || item.description.toLowerCase().includes(search.toLowerCase());
+  const { data: items = [], isLoading, isError } = useQuery({
+    queryKey: ['items'],
+    queryFn: fetchItems,
+  });
+
+  const filtered = items.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
+      (item.description && item.description.toLowerCase().includes(search.toLowerCase()));
     const matchesCat = category === 'All' || item.category === category;
     return matchesSearch && matchesCat;
   });
@@ -49,16 +71,24 @@ const LostItems = () => {
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filtered.map((item, i) => (
-            <ItemCard key={item.id} item={item} index={i} />
-          ))}
-        </div>
-        {filtered.length === 0 && (
-          <div className="text-center py-16">
-            <Search className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
-            <p className="text-muted-foreground">No items found matching your search.</p>
-          </div>
+        {isLoading ? (
+          <div className="py-16 flex justify-center"><p className="text-muted-foreground">Loading items...</p></div>
+        ) : isError ? (
+          <div className="py-16 flex justify-center"><p className="text-destructive">Failed to load items. Please try again later.</p></div>
+        ) : (
+          <>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filtered.map((item, i) => (
+                <ItemCard key={item.id} item={item} index={i} />
+              ))}
+            </div>
+            {filtered.length === 0 && (
+              <div className="text-center py-16">
+                <Search className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-muted-foreground">No items found matching your search.</p>
+              </div>
+            )}
+          </>
         )}
       </div>
       <Footer />

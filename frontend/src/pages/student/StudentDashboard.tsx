@@ -2,14 +2,55 @@ import { Link } from 'react-router-dom';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { useAuth } from '@/contexts/AuthContext';
-import { mockItems, mockClaims } from '@/data/mockData';
 import { motion } from 'framer-motion';
 import { Package, ClipboardList, PlusCircle, Search } from 'lucide-react';
 import ItemCard from '@/components/shared/ItemCard';
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/axios';
+import { Claim, LostItem } from '@/types';
+
+const fetchMyClaims = async (): Promise<Claim[]> => {
+  const { data } = await api.get('/claims/my');
+  if (data.success && data.claims) {
+    return data.claims.map((c: any) => ({
+      ...c,
+      id: c._id,
+      itemName: c.item?.title || 'Unknown Item',
+      date: new Date(c.createdAt).toLocaleDateString(),
+    }));
+  }
+  return [];
+};
+
+const fetchRecentItems = async (): Promise<{ items: LostItem[], total: number }> => {
+  // Let's just get the recent items and total available from items API
+  const { data } = await api.get('/items?limit=4&status=available');
+  if (data.success) {
+    return {
+      total: data.total,
+      items: data.items.map((item: any) => ({
+        ...item,
+        id: item._id,
+        name: item.title,
+        date: new Date(item.foundDate || item.createdAt).toLocaleDateString(),
+      }))
+    };
+  }
+  return { items: [], total: 0 };
+};
 
 const StudentDashboard = () => {
   const { user } = useAuth();
-  const studentClaims = mockClaims.filter(c => c.studentId === 's1');
+
+  const { data: studentClaims = [], isLoading: loadingClaims } = useQuery({
+    queryKey: ['myClaims'],
+    queryFn: fetchMyClaims,
+  });
+
+  const { data: itemsData = { items: [], total: 0 }, isLoading: loadingItems } = useQuery({
+    queryKey: ['recentItemsQuery'],
+    queryFn: fetchRecentItems,
+  });
 
   return (
     <div className="min-h-screen bg-secondary/30">
@@ -22,9 +63,9 @@ const StudentDashboard = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
           {[
-            { label: 'Browse Items', value: mockItems.length, icon: Search, color: 'text-primary', link: '/lost-items' },
+            { label: 'Browse Items', value: '--', icon: Search, color: 'text-primary', link: '/lost-items' },
             { label: 'My Claims', value: studentClaims.length, icon: ClipboardList, color: 'text-warning', link: '/student/claims' },
-            { label: 'Available Items', value: mockItems.filter(i => i.status === 'available').length, icon: Package, color: 'text-success', link: '/lost-items' },
+            { label: 'Available Items', value: itemsData.total, icon: Package, color: 'text-success', link: '/lost-items' },
             { label: 'Report Found', value: '+', icon: PlusCircle, color: 'text-info', link: '/student/report' },
           ].map((card, i) => (
             <motion.div key={card.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
@@ -38,7 +79,9 @@ const StudentDashboard = () => {
         </div>
 
         <h2 className="text-lg font-semibold text-foreground mt-10 mb-4">Recent Claims</h2>
-        {studentClaims.length === 0 ? (
+        {loadingClaims ? (
+          <p className="text-muted-foreground text-sm">Loading claims...</p>
+        ) : studentClaims.length === 0 ? (
           <p className="text-muted-foreground text-sm">No claims yet. Browse items to make a claim.</p>
         ) : (
           <div className="bg-card rounded-xl border border-border overflow-hidden">
@@ -58,11 +101,15 @@ const StudentDashboard = () => {
         )}
 
         <h2 className="text-lg font-semibold text-foreground mt-10 mb-4">Recently Found</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {mockItems.filter(i => i.status === 'available').slice(0, 4).map((item, i) => (
-            <ItemCard key={item.id} item={item} index={i} />
-          ))}
-        </div>
+        {loadingItems ? (
+          <p className="text-muted-foreground text-sm">Loading items...</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {itemsData.items.map((item, i) => (
+              <ItemCard key={item.id} item={item} index={i} />
+            ))}
+          </div>
+        )}
       </div>
       <Footer />
     </div>

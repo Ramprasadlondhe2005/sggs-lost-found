@@ -17,6 +17,7 @@ import StudentLogin from "./pages/auth/StudentLogin";
 import GuardLogin from "./pages/auth/GuardLogin";
 import AdminLogin from "./pages/auth/AdminLogin";
 import Register from "./pages/auth/Register";
+import GuardRegister from "./pages/auth/GuardRegister";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import MyClaims from "./pages/student/MyClaims";
 import ReportFound from "./pages/student/ReportFound";
@@ -37,7 +38,7 @@ const App = () => (
         <NotificationProvider>
           <Toaster />
           <Sonner />
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/lost-items" element={<LostItems />} />
@@ -48,6 +49,7 @@ const App = () => (
               <Route path="/guard-login" element={<GuardLogin />} />
               <Route path="/admin-login" element={<AdminLogin />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/guard-register" element={<GuardRegister />} />
 
               {/* Student Routes */}
               <Route path="/student/dashboard" element={<ProtectedRoute allowedRoles={['student']}><StudentDashboard /></ProtectedRoute>} />

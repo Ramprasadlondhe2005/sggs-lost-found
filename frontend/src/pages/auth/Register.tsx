@@ -4,25 +4,46 @@ import { motion } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
-const branches = ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'Civil', 'Chemical', 'Electrical', 'Instrumentation'];
-const years = [1, 2, 3, 4];
+const branches = [
+  'Computer Science',
+  'Information Technology',
+  'Electronics & Telecommunication',
+  'Electrical Engineering',
+  'Mechanical Engineering',
+  'Civil Engineering',
+  'Production Engineering'
+];
+const years = ['First Year (FE)', 'Second Year (SE)', 'Third Year (TE)', 'Final Year (BE)'];
 
 const Register = () => {
   const [form, setForm] = useState({ name: '', email: '', prn: '', branch: '', year: '', phone: '', password: '', confirm: '' });
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
 
   const update = (key: string, value: string) => setForm(prev => ({ ...prev, [key]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!/^\d{4}[A-Z]{2}\d{3}$/.test(form.prn)) { setError('PRN format: 2021CS123'); return; }
+    if (!/^\d{4}(CS|IT|EC|EE|ME|CE|PR)\d{3}$/i.test(form.prn)) { setError('Invalid PRN format (e.g., 2024IT509)'); return; }
     if (form.password !== form.confirm) { setError('Passwords do not match'); return; }
     if (form.password.length < 6) { setError('Password must be at least 6 characters'); return; }
-    login(form.email, form.password, 'student');
-    navigate('/student/dashboard');
+    try {
+      await register({
+        name: form.name,
+        email: form.email,
+        prn: form.prn,
+        branch: form.branch,
+        year: form.year,
+        phone: form.phone,
+        password: form.password,
+        role: 'student'
+      });
+      navigate('/student/dashboard');
+    } catch (err: any) {
+      setError(err.message || 'Registration failed');
+    }
   };
 
   return (
@@ -52,7 +73,7 @@ const Register = () => {
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground">PRN</label>
-                <input required value={form.prn} onChange={e => update('prn', e.target.value)} placeholder="2021CS123" className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
+                <input required value={form.prn} onChange={e => update('prn', e.target.value.toUpperCase())} placeholder="2024IT509" className="mt-1 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm text-foreground focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none" />
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground">Phone</label>

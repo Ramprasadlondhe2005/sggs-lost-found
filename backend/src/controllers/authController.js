@@ -38,6 +38,17 @@ export const register = async (req, res) => {
             }
         }
 
+        // Check employeeId uniqueness for guards
+        if (role === 'guard' && employeeId) {
+            const employeeIdExists = await User.findOne({ employeeId });
+            if (employeeIdExists) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Employee ID already registered'
+                });
+            }
+        }
+
         // Create user
         const user = await User.create({
             name,
