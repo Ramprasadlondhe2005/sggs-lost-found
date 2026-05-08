@@ -27,17 +27,26 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // CORS
+// app.use(cors({
+//     origin: [
+//         process.env.FRONTEND_URL || 'http://localhost:5173',
+//         'http://localhost:8080',
+//         'http://localhost:8081',
+//         'http://localhost:8082',
+//         'http://localhost:3000'
+//     ],
+//     credentials: true,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization']
+// }));
+
 app.use(cors({
     origin: [
-        process.env.FRONTEND_URL || 'http://localhost:5173',
-        'http://localhost:8080',
-        'http://localhost:8081',
-        'http://localhost:8082',
-        'http://localhost:3000'
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'https://sggs-lost-found.vercel.app'
     ],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    credentials: true
 }));
 
 // Security middleware
